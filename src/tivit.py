@@ -192,9 +192,9 @@ class TiViT_HF(BaseTiViT):
                 raise ValueError("Unknown model architecture cannot be truncated.")
 
     def forward_vit(self, inputs):
+        device = inputs.device
         inputs = [self.to_pil(im) for im in inputs]
-        inputs = self.processor(images=inputs, return_tensors="pt")
-        inputs = {k: v.cuda() for k, v in inputs.items()}
+        inputs = self.processor(images=inputs, return_tensors="pt").to(device)
         outputs = self.vit(
             **inputs,
             output_hidden_states=(self.layer_idx is None),

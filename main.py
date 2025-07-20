@@ -56,6 +56,8 @@ if __name__ == "__main__":
     with open(f"{result_dir}/args.json", "w") as f:
         json.dump(args_dict, f, indent=4)
 
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+
     if args.datasets == "ucr":
         datasets = univariate
     elif args.datasets == "uea":
@@ -67,7 +69,7 @@ if __name__ == "__main__":
         print(dataset)
 
         train_loader, train_labels, test_loader, test_labels = get_dataloader(
-            dataset, args.batch_size, args
+            dataset, args
         )
 
         print("Samples: ", len(train_loader.dataset) + len(test_loader.dataset))
@@ -80,14 +82,14 @@ if __name__ == "__main__":
 
         # Embedding with Mantis TSFM
         if args.mantis:
-            network = Mantis8M(device="cuda")
+            network = Mantis8M(device=device)
             network = network.from_pretrained("paris-noah/Mantis-8M")
-            network = network.to("cuda")
-            mantis_trainer = MantisTrainer(device="cuda", network=network)
+            network = network.to(device)
+            mantis_trainer = MantisTrainer(device=device, network=network)
 
             mantis_embedding = (
-                embed(mantis_trainer, train_loader, "mantis", channels),
-                embed(mantis_trainer, test_loader, "mantis", channels),
+                embed(mantis_trainer, train_loader, "mantis", channels, device),
+                embed(mantis_trainer, test_loader, "mantis", channels, device),
             )
 
         # Embedding with MOMENT TSFM
@@ -97,12 +99,12 @@ if __name__ == "__main__":
                 model_kwargs={"task_name": "embedding"},
             )
             moment.init()
-            moment.to("cuda").float()
+            moment.to(device).float()
             moment.eval()
 
             moment_embedding = (
-                embed(moment, train_loader, "moment", channels),
-                embed(moment, test_loader, "moment", channels),
+                embed(moment, train_loader, "moment", channels, device),
+                embed(moment, test_loader, "moment", channels, device),
             )
 
         patch_sizes = get_patch_size(patch_size=args.patch_size, T=T)
@@ -121,12 +123,12 @@ if __name__ == "__main__":
                     stride=args.stride,
                     patch_size=p,
                 )
-                tivit = tivit.to(device="cuda")
+                tivit = tivit.to(device=device)
                 tivit.eval()
 
                 vision_embedding_1 = (
-                    embed(tivit, train_loader, "tivit", channels),
-                    embed(tivit, test_loader, "tivit", channels),
+                    embed(tivit, train_loader, "tivit", channels, device),
+                    embed(tivit, test_loader, "tivit", channels, device),
                 )
 
             # Embedding with TiViT (2nd ViT configuration)
@@ -138,12 +140,12 @@ if __name__ == "__main__":
                     stride=args.stride,
                     patch_size=p,
                 )
-                tivit = tivit.to(device="cuda")
+                tivit = tivit.to(device=device)
                 tivit.eval()
 
                 vision_embedding_2 = (
-                    embed(tivit, train_loader, "tivit", channels),
-                    embed(tivit, test_loader, "tivit", channels),
+                    embed(tivit, train_loader, "tivit", channels, device),
+                    embed(tivit, test_loader, "tivit", channels, device),
                 )
 
             # Linear classification
@@ -213,5 +215,4 @@ if __name__ == "__main__":
                     "Please choose: linear probing, intrinsic dimension, principal components, alignment."
                 )
 
-            del tivit
             torch.cuda.empty_cache()

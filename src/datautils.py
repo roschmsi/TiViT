@@ -81,7 +81,7 @@ def sample_equal_classes(train_data, train_labels, num_samples=1000):
     return sampled_data, sampled_labels
 
 
-def get_dataloader(dataset, batch_size, args):
+def get_dataloader(dataset, args):
     data_dir = f"{args.data_dir}/{str(args.datasets).upper()}"
 
     train_data, train_labels = load_classification(
@@ -135,13 +135,13 @@ def get_dataloader(dataset, batch_size, args):
     train_loader = DataLoader(
         TensorDataset(torch.Tensor(train_data).type(torch.float)),
         num_workers=4,
-        batch_size=batch_size,
+        batch_size=args.batch_size,
         shuffle=False,
     )
     test_loader = DataLoader(
         TensorDataset(torch.Tensor(test_data).type(torch.float)),
         num_workers=4,
-        batch_size=batch_size,
+        batch_size=args.batch_size,
         shuffle=False,
     )
 

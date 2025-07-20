@@ -5,7 +5,7 @@ from tqdm import tqdm
 from src.utils import resize_mantis_input, resize_moment_input
 
 
-def embed(model, dataloader, model_type, channels):
+def embed(model, dataloader, model_type, channels, device):
     batch_embeds = []
 
     for (batch,) in tqdm(dataloader):
@@ -18,17 +18,17 @@ def embed(model, dataloader, model_type, channels):
             with torch.no_grad():
 
                 if model_type == "tivit":
-                    batch_dim = batch_dim.to("cuda")
+                    batch_dim = batch_dim.to(device)
                     outputs = model(batch_dim).cpu().numpy()
 
                 elif model_type == "mantis":
                     batch_dim = resize_mantis_input(batch_dim.transpose(1, 2))
-                    batch_dim = batch_dim.to("cuda")
+                    batch_dim = batch_dim.to(device)
                     outputs = model.transform(batch_dim)
 
                 elif model_type == "moment":
                     batch_dim = resize_moment_input(batch_dim.transpose(1, 2))
-                    batch_dim = batch_dim.to("cuda").float()
+                    batch_dim = batch_dim.to(device).float()
                     outputs = model(x_enc=batch_dim).embeddings
                     outputs = outputs.cpu().numpy()
 
