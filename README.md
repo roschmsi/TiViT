@@ -71,6 +71,8 @@ To further improve classification accuracy, we propose to concatenate the repres
 - `--mantis`
 - `--moment [small | base | large]`
 
+Use `--aggregation all` to return all token representations. This mode is intended for embedding extraction and cannot be combined with `--classifier_type`. Classification requires a single representation per sample, which you can obtain using `--aggregation mean` or `--aggregation cls_token`.
+
 
 The following table summarizes the linear classification accuracy of TiViT and TSFMs on the UCR and UEA benchmark.
 

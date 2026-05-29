@@ -70,6 +70,13 @@ def concat_embeddings(
     embeds_train = [e[0] for e in embeddings]
     embeds_test = [e[1] for e in embeddings]
 
+    if any(e.ndim != 2 for e in embeds_train + embeds_test):
+        raise ValueError(
+            "Classification requires one representation vector per sample. "
+            "Use `aggregation='mean'` or `aggregation='cls_token'` instead of "
+            "`aggregation='all'`."
+        )
+
     embeds_train = np.concatenate(embeds_train, axis=1)
     embeds_test = np.concatenate(embeds_test, axis=1)
 

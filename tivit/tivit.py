@@ -114,6 +114,8 @@ class BaseTiViT(nn.Module, ABC):
             pooled = hidden_states.mean(dim=1)
         elif aggregation == "cls_token":
             pooled = hidden_states[:, 0, :]
+        elif aggregation == "all" or aggregation is None:
+            pooled = hidden_states
         else:
             raise ValueError(f"Unsupported aggregation {aggregation}")
 

@@ -32,6 +32,13 @@ from tivit.utils import get_patch_size, set_random_seed, write_result_table
 def main():
     args = parse_args()
 
+    if args.classifier_type and args.aggregation == "all":
+        raise ValueError(
+            "`--aggregation all` returns token-level representations and cannot be "
+            "used with `--classifier_type`. Choose `--aggregation mean` or "
+            "`--aggregation cls_token` for classification."
+        )
+
     set_random_seed(args.random_seed)
 
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")

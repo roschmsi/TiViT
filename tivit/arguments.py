@@ -60,6 +60,7 @@ def parse_args():
     parser.add_argument(
         "--aggregation",
         type=str,
+        choices=["mean", "cls_token", "all"],
         help="Aggregation of hidden representations",
     )
 
