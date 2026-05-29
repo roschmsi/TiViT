@@ -27,11 +27,6 @@ conda activate tivit_env
 python -m pip install -e .
 ```
 
-For intrinsic dimensionality analysis with `--get_intrinsic_dimension`, install the optional analysis dependency:
-```bash
-python -m pip install -e ".[analysis]"
-```
-
 ## Datasets
 
 We evaluate TiViT on the [UCR and UEA benchmark](https://www.timeseriesclassification.com/) for time series classification. The benchmark datasets can be loaded via the [aeon](https://www.aeon-toolkit.org) toolkit. For UCR datasets, we apply by default linear interpolation to handle missing values and use padding to accommodate unequal time series lengths. To use the preprocessing functionality provided by Aeon instead, add the `--aeon` flag.
