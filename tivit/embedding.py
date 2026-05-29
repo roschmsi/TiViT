@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from tqdm import tqdm
 
-from src.utils import resize_mantis_input, resize_moment_input
+from tivit.utils import resize_mantis_input, resize_moment_input
 
 
 def embed(model, dataloader, model_type, channels, device):

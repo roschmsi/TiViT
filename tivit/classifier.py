@@ -4,7 +4,7 @@ from sklearn.neighbors import NearestCentroid
 from sklearn.pipeline import make_pipeline
 from sklearn.preprocessing import StandardScaler
 
-import src.utils as utils
+import tivit.utils as utils
 
 
 def get_classifier(classifier_type, random_seed):

@@ -19,12 +19,17 @@ Time series classification is a fundamental task in healthcare and industry, yet
 
 Illustration of TiViT on a time series sample from [ECG200](https://www.timeseriesclassification.com/description.php?Dataset=ECG200). We split the time series into segments and stack them to form a grayscale image. Then, we patch the image in 2D and feed it into a frozen ViT pretrained on large-scale image datasets. We average the hidden representations from a specific layer and pass them to a learnable classification head. Combining the representations of TiViT and TSFMs such as Mantis further improves classification accuracy.
 
-## Dependencies
-This repository works with Python 3.11 and PyTorch 2.7. Please create a conda environment and install the dependencies specified in [`requirements.txt`](requirements.txt).
+## Installation
+This repository works with Python 3.11 and PyTorch 2.7. Please create a conda environment and install TiViT in editable mode:
 ```bash
 conda create -n tivit_env python=3.11
 conda activate tivit_env
-python -m pip install -r requirements.txt
+python -m pip install -e .
+```
+
+For intrinsic dimensionality analysis with `--get_intrinsic_dimension`, install the optional analysis dependency:
+```bash
+python -m pip install -e ".[analysis]"
 ```
 
 ## Datasets
@@ -57,10 +62,10 @@ We compare and optionally fuse TiViT with two state-of-the-art TSFMs exclusively
 Below is an example command to perform classification with TiViT on the UCR benchmark using hidden representations from layer 14 of an OpenCLIP ViT-H model:
 
 ```bash
-python main.py --vit_1_name laion/CLIP-ViT-H-14-laion2B-s32B-b79K --vit_1_layer 14 --aggregation mean --patch_size sqrt --stride 0.1 --classifier_type logistic_regression --datasets ucr --data_dir /path/to/your/data --result_dir /path/to/save/results --random_seed 2025
+tivit --vit_1_name laion/CLIP-ViT-H-14-laion2B-s32B-b79K --vit_1_layer 14 --aggregation mean --patch_size sqrt --stride 0.1 --classifier_type logistic_regression --datasets ucr --data_dir /path/to/your/data --result_dir /path/to/save/results --random_seed 2025
 ```
 
-Check out [`arguments.py`](./src/arguments.py) for a comprehensive overview of all configurable parameters.
+Check out [`arguments.py`](./tivit/arguments.py) for a comprehensive overview of all configurable parameters.
 To further improve classification accuracy, we propose to concatenate the representations of TiViT and traditional TSFMs by adding:
 
 - `--mantis`
@@ -82,7 +87,7 @@ The following table summarizes the linear classification accuracy of TiViT and T
 To better understand the hidden representations of ViTs, we analyze how their structure evolves across layers. Use the following command to compute the intrinsic dimension of representations from CLIP ViT-H:
 
 ```bash
-python main.py --vit_1_name laion/CLIP-ViT-H-14-laion2B-s32B-b79K --aggregation mean --patch_size sqrt --stride 0.1 --get_intrinsic_dimension --datasets ucr --data_dir /path/to/your/data --result_dir /path/to/save/results --random_seed 2025
+tivit --vit_1_name laion/CLIP-ViT-H-14-laion2B-s32B-b79K --aggregation mean --patch_size sqrt --stride 0.1 --get_intrinsic_dimension --datasets ucr --data_dir /path/to/your/data --result_dir /path/to/save/results --random_seed 2025
 ```
 
 Alternatively, you may compute the number of principal components necessary to cover 95\% of the variance in the representations by setting the flag `--get_principal_components`.
@@ -92,7 +97,7 @@ Alternatively, you may compute the number of principal components necessary to c
 The alignment of representations from CLIP ViT-H (layer 14) and Mantis on the UCR benchmark can be measured using the mutual k-NN metric.
 
 ```bash
-python main.py --vit_1_name laion/CLIP-ViT-H-14-laion2B-s32B-b79K --vit_1_layer 14 --aggregation mean --patch_size sqrt --stride 0.1 --mantis --measure_alignment --datasets ucr --data_dir /path/to/your/data --result_dir /path/to/save/results --random_seed 2025
+tivit --vit_1_name laion/CLIP-ViT-H-14-laion2B-s32B-b79K --vit_1_layer 14 --aggregation mean --patch_size sqrt --stride 0.1 --mantis --measure_alignment --datasets ucr --data_dir /path/to/your/data --result_dir /path/to/save/results --random_seed 2025
 ```
 
 You may specify different ViTs (`--vit_1_name`, `--vit_2_name`) and/or TSFMs (`--mantis`, `--moment`). Note that the alignment score can only be computed between two models at a time.

@@ -3,14 +3,22 @@ import os
 import numpy as np
 import pandas as pd
 import torch
-from dadapy.data import Data
 from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 
-from src.mutual_knn import mutual_knn
+from tivit.mutual_knn import mutual_knn
 
 
 def get_intrinsic_dimension(embedding, dataset, result_dir):
+    try:
+        from dadapy.data import Data
+    except ImportError as exc:
+        raise ImportError(
+            "Computing intrinsic dimensionality requires DADApy. Install TiViT with "
+            "`python -m pip install 'tivit[analysis]'` or install a compatible "
+            "DADApy version manually."
+        ) from exc
+
     results = []
 
     for i in range(len(embedding)):
